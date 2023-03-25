@@ -1,115 +1,270 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(PaybackpalApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  // This widget is the root of your application.
+class PaybackpalApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Paybackpal',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'PayBackPal'),
     );
   }
 }
 
+class Transaction {
+  final double amount;
+  final String notes;
+  String _description;
+
+  Transaction({required this.amount, required this.notes, required String description})
+      : _description = description,
+        assert(amount != 0.0, 'Amount cannot be 0.0'),
+        assert(notes.isNotEmpty, 'Notes cannot be empty'),
+        assert(description.isNotEmpty, 'Description cannot be empty');
+
+
+  String get description => _description;
+
+  // setter for description
+  set description(String value) {
+    _description = value;
+  }
+}
+
+
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
+  MyHomePage({Key? key, required this.title}) : super(key: key);
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  Map<String, double> _balances = {}; // Map of person name to outstanding balance
+  final TextEditingController _controller = TextEditingController(); // Text controller for text field
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+  void _addDebt(String person, double debt, String notes) {
+  setState(() {
+    _balances[person] = _balances[person]! + debt;
+  });
+}
+
+List<Transaction> _getTransactionHistory(String person) {
+  // Implementation for getting transaction history for a given person
+  return [];
+}
+
+
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+      body: ListView.builder(
+        itemCount: _balances.length,
+        itemBuilder: (context, index) {
+          String person = _balances.keys.elementAt(index);
+          double balance = _balances[person]!;
+          return ListTile(
+            title: Text(person),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('₹${balance.toStringAsFixed(2)}'),
+                IconButton(
+                  onPressed: () {
+                    _showDeletePersonDialog(context, person); // Show delete person dialog
+                  },
+                  icon: Icon(Icons.delete),
+                ),
+              ],
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PersonDetailsPage(
+                    name: person,
+                    balance: balance,
+                    transactionHistory: _getTransactionHistory(person).map((t) => t.description).toList(),
+                    onAddDebt: (double debt, String notes) {
+                      setState(() {
+                        _addDebt(person, debt, notes);
+                      });
+                    },
+                  ),
+                ),
+              );
+            },
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+        onPressed: () {
+          _showAddPersonDialog(context); // Show add person dialog
+        },
+        tooltip: 'Add Person',
+        child: Icon(Icons.add),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.miniStartFloat,
     );
   }
+
+  // Show dialog to add a new person
+  void _showAddPersonDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Add Person'),
+          content: TextField(
+            controller: _controller,
+            decoration: InputDecoration(hintText: 'Enter name'),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Add'),
+              onPressed: () {
+                setState(() {
+                  _balances[_controller.text] = 0.0;
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Show dialog to delete a person
+  void _showDeletePersonDialog(BuildContext context, String person) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Person'),
+          content: Text('Are you sure you want to delete $person?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Delete'),
+              onPressed: () {
+                setState(() {
+                  _balances.remove(person);
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class PersonDetailsPage extends StatelessWidget {
+  final String name;
+  final double balance;
+  final List<String> transactionHistory;
+  final void Function(double, String) onAddDebt;
+
+  PersonDetailsPage({
+    Key? key,
+    required this.name,
+    required this.balance,
+    required this.transactionHistory,
+    required this.onAddDebt,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(name),
+      ),
+      body: Column(
+        children: [
+          Text(
+            'Outstanding balance: \$${balance.toStringAsFixed(2)}',
+            style: TextStyle(fontSize: 24.0),
+          ),
+          SizedBox(height: 16.0),
+          Expanded(
+            child: ListView.builder(
+              itemCount: transactionHistory.length,
+              itemBuilder: (context, index) {
+                String transaction = transactionHistory[index];
+                return ListTile(
+                  title: Text(transaction),
+                );
+              },
+            ),
+          ),
+          SizedBox(height: 16.0),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Enter amount',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  controller: _debtController,
+                ),
+              ),
+              SizedBox(width: 16.0),
+              Expanded(
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Enter notes',
+                    border: OutlineInputBorder(),
+                  ),
+                  controller: _notesController,
+                ),
+              ),
+              SizedBox(width: 16.0),
+              IconButton(
+                onPressed: () {
+                  double debt = double.tryParse(_debtController.text) ?? 0.0;
+                  String notes = _notesController.text.trim();
+                  if (debt > 0) {
+                    onAddDebt(debt, notes);
+                    _debtController.clear();
+                    _notesController.clear();
+                  }
+                },
+                icon: Icon(Icons.add),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  final TextEditingController _debtController = TextEditingController();
+  final TextEditingController _notesController = TextEditingController();
 }
