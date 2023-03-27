@@ -5,6 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from "@react-navigation/stack";
 import Home from "./screens/Home";
 import Scanner from "./screens/Scanner";
+import FriendState from "./context/FriendState";
 
 const Stack = createStackNavigator();
 
@@ -19,9 +20,11 @@ function MyStack() {
 
 function App() {
   return <>
+    <FriendState>
     <NavigationContainer>
       <MyStack />
     </NavigationContainer>
+    </FriendState>
   </>;
 }
 
