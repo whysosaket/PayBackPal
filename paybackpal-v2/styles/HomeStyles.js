@@ -13,7 +13,9 @@ const styles = StyleSheet.create({
       color: '#2B369D',
     },
     headerview: {
-      top: -320,
+      position: 'absolute',
+      top: 0,
+      zIndex: 13,
     },
     addButtonText: {
       color: '#fff',
@@ -105,6 +107,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+    trash: {
+        position: 'absolute',
+        bottom: '15%',
+        width: 20,
+        height: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 13,
+    }, 
+    
   });
 
   export { styles };

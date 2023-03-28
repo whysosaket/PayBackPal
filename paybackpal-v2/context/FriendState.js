@@ -1,25 +1,40 @@
 import FriendContext from "./friendContext";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect, useState } from "react";
 
 
 const FriendState = (props) => {
 
-    const money = [
-        {reason: 'Bought me a drink', amount: 10, type: 'debit'},
-        {reason: 'Bought me Pen', amount: 25, type: 'debit'},
-        {reason: 'Momos', amount: 50, type: 'credit'},
-        {reason: 'Chole Bhature', amount: 100, type: 'credit'},
-        {reason: 'Bought me a drink', amount: 10, type: 'debit'},
-        {reason: 'Bought me Pen', amount: 25, type: 'debit'},
-        {reason: 'Momos', amount: 50, type: 'credit'},
-        {reason: 'Chole Bhature asdkjabhskjdbkasdk asdnm askdjabedkjbk', amount: 100, type: 'credit'},
-    ]
+    const [friends, setFriends] = useState([]);
+    const [allData, setAllData] = useState([]);
 
+    useEffect(() => {
+        const getFriends = async () => {
+            const jsonValue = await AsyncStorage.getItem('FriendName')
+            const parsedValue = jsonValue != null ? JSON.parse(jsonValue) : null;
+            setFriends(parsedValue);
+        }
+        getFriends();
+    }, []);
 
-    const storeData = async (value) => {
+    const profileFormat = {
+        name: '',
+        transaction: [],
+        total: 0,
+        totalDebit: 0,
+        totalCredit: 0,
+        paid: false,
+        paidDate: '',
+    }
+
+    const storeName = async (value) => {
+
+        // set name's each first letter to uppercase
+        value = value.split(' ').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+
         try {
           // get the value from the storage
-          const jsonValue = await AsyncStorage.getItem('firendName')
+          const jsonValue = await AsyncStorage.getItem('FriendName')
           // save the previous value with the new value
         
           // check if the value is already in the storage
@@ -27,7 +42,8 @@ const FriendState = (props) => {
           if(alreadyInStorage) return "BadRequest";
 
           const newValue = jsonValue != null ? [...JSON.parse(jsonValue), value] : [value];
-          await AsyncStorage.setItem('firendName', JSON.stringify(newValue));
+          await AsyncStorage.setItem('FriendName', JSON.stringify(newValue));
+          setFriends(newValue);
           return newValue;
         } catch (e) {
           // saving error
@@ -36,17 +52,166 @@ const FriendState = (props) => {
 
     const getData = async () => {
         try {
-            const jsonValue = await AsyncStorage.getItem('firendName')
-            return jsonValue != null ? JSON.parse(jsonValue) : null;
+            const jsonValue = await AsyncStorage.getItem('FriendName')
+            const parsedValue = jsonValue != null ? JSON.parse(jsonValue) : null
+            return parsedValue;
+
+            async function getProfiles (){
+                let data = [];
+                parsedValue.forEach(async (name) => {
+                    let newname = name.toLowerCase().replace(/\s/g, '');
+                    const profile = await getProfile(newname);
+                    if(profile===null) return;
+                    data.push({name: name, total: profile});
+                })
+                return data;
+            }
+            const result = await getProfiles();
+            console.log(result);
+            return result;
+
         } catch(e) {
             // error reading value
         }
     }
+
+    const getProfile = async (name) => {
+        name = name.toLowerCase().replace(/\s/g, '');
+        try {
+            const jsonValue = await AsyncStorage.getItem(name);
+            const parsedValue = jsonValue != null ? JSON.parse(jsonValue) : null;
+            return parsedValue.total;
+        } catch(e) {
+            // error reading value
+        }
+    }
+
+   const removeAllData = async () => {
+        try {
+            await AsyncStorage.clear();
+        } catch(e) {
+            // error reading value
+        }
+    }
+
+    const addTransaction = async (name, transaction) => {
+        name = name.toLowerCase().replace(/\s/g, '');
+        const {amount, type} = transaction;
+        try {
+            const jsonValue = await AsyncStorage.getItem(name);
+            // add transaction to the profile
+            let transactionArray = jsonValue != null ? JSON.parse(jsonValue).transaction : [];
+            transactionArray = [transaction,...transactionArray];
+            // update the total
+            let total = jsonValue != null ? JSON.parse(jsonValue).total : 0;
+            total = type==='credit' ? total+amount : total-amount;
+            // update the totalDebit
+            let totalDebit = jsonValue != null ? JSON.parse(jsonValue).totalDebit : 0;
+            totalDebit = type==='debit' ? totalDebit+amount : totalDebit;
+            // update the totalCredit
+            let totalCredit = jsonValue != null ? JSON.parse(jsonValue).totalCredit : 0;
+            totalCredit = type==='credit' ? totalCredit+amount : totalCredit;
+            // save the new profile
+            const newProfile = {
+                name,
+                transaction: transactionArray,
+                total,
+                totalDebit,
+                totalCredit,
+            }
+            await AsyncStorage.setItem(name, JSON.stringify(newProfile));
+            return newProfile;
+        } catch(e) {
+            // error reading value
+        }
+    }
+
+    const removeTransaction = async (name, transaction) => {
+        name = name.toLowerCase().replace(/\s/g, '');
+        const {amount, type} = transaction;
+        try {
+            const jsonValue = await AsyncStorage.getItem(name);
+            // remove transaction from the profile
+            let transactionArray = jsonValue != null ? JSON.parse(jsonValue).transaction : [];
+            transactionArray = transactionArray.filter((item) => item!==transaction);
+            // update the total
+            let total = jsonValue != null ? JSON.parse(jsonValue).total : 0;
+            total = type==='credit' ? total-amount : total+amount;
+            // update the totalDebit
+            let totalDebit = jsonValue != null ? JSON.parse(jsonValue).totalDebit : 0;
+            totalDebit = type==='debit' ? totalDebit-amount : totalDebit;
+            // update the totalCredit
+            let totalCredit = jsonValue != null ? JSON.parse(jsonValue).totalCredit : 0;
+            totalCredit = type==='credit' ? totalCredit-amount : totalCredit;
+            // update the profile
+            const newValue = {...profileFormat, name, transaction: transactionArray, total, totalDebit, totalCredit};
+            await AsyncStorage.setItem(name, JSON.stringify(newValue));
+            return newValue;
+        } catch(e) {
+            // error reading value
+        }
+    }
+
+   const paidTransaction = async (name, transaction) => {
+        name = name.toLowerCase().replace(/\s/g, '');
+        const {amount, type} = transaction;
+        try {
+            const jsonValue = await AsyncStorage.getItem(name);
+            // remove transaction from the profile
+            let transactionArray = jsonValue != null ? JSON.parse(jsonValue).transaction : [];
+            transactionArray = transactionArray.map((item) => {
+                if(item===transaction) {
+                    item.paid = true;
+                }
+                return item;
+            });
+            // update the total
+            let total = jsonValue != null ? JSON.parse(jsonValue).total : 0;
+            total = type==='credit' ? total-amount : total+amount;
+            // update the totalDebit
+            let totalDebit = jsonValue != null ? JSON.parse(jsonValue).totalDebit : 0;
+            totalDebit = type==='debit' ? totalDebit-amount : totalDebit;
+            // update the totalCredit
+            let totalCredit = jsonValue != null ? JSON.parse(jsonValue).totalCredit : 0;
+            totalCredit = type==='credit' ? totalCredit-amount : totalCredit;
+            // update the profile
+            const newValue = {...profileFormat, name, transaction: transactionArray, total, totalDebit, totalCredit};
+            await AsyncStorage.setItem(name, JSON.stringify(newValue));
+            return newValue;
+        } catch(e) {
+            // error reading value
+        }
+    }
+
+    const getTransaction = async (name) => {
+        name = name.toLowerCase().replace(/\s/g, '');
+        try {
+            const jsonValue = await AsyncStorage.getItem(name);
+            return jsonValue != null ? JSON.parse(jsonValue).transaction : null;
+        } catch(e) {
+            // error reading value
+        }
+    }
+
+    const removeProfile = async (name) => {
+        let lname = name.toLowerCase().replace(/\s/g, '');
+        try {
+            await AsyncStorage.removeItem(lname);
+            let jsonValue = await AsyncStorage.getItem('FriendName');
+            let newValue = jsonValue != null ? JSON.parse(jsonValue).filter((item) => item!==name) : [];
+            await AsyncStorage.setItem('FriendName', JSON.stringify(newValue));
+            setFriends(newValue);
+        } catch(e) {
+            // error reading value
+            console.log(e);
+        }
+    }
+
     
 
 
     return(
-        <FriendContext.Provider value={{money, getData, storeData}}>
+        <FriendContext.Provider value={{friends,allData, getData, storeName, removeAllData, addTransaction, getTransaction, removeProfile, paidTransaction, removeTransaction}}>
             {props.children}
         </FriendContext.Provider>
     )

@@ -34,6 +34,15 @@ const styles = StyleSheet.create({
       padding: 5,
       backgroundColor: 'red',
     },
+    trash: {
+        position: 'absolute',
+        top: '28%',
+        width: 22,
+        height: 22,
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 13,
+    }, 
   
   });
   
@@ -81,6 +90,32 @@ const styles = StyleSheet.create({
       top: 2,
       right: 5,
     },
+    creditbutton: {
+      fontSize: 15,
+      fontWeight: 'bold',
+      color: 'white',
+      alignSelf: 'center',
+      borderColor: 'green',
+      borderWidth: 1,
+      borderRadius: 10,
+      padding: 7,
+      backgroundColor: 'green',
+      top: 20,
+      left: -50
+    },
+    debitbutton: {
+        fontSize: 15,
+      fontWeight: 'bold',
+      color: 'white',
+      alignSelf: 'center',
+      borderColor: 'red',
+      borderWidth: 1,
+      borderRadius: 10,
+      padding: 7,
+      backgroundColor: 'red',
+      top: -17,
+      left: 50
+    }
   });
   
   const inputStyles = StyleSheet.create({
@@ -169,6 +204,13 @@ const styles = StyleSheet.create({
         color: 'red',
         fontSize: 20,
         fontWeight: 'bold',
+        },
+        noTransactions: {
+            fontSize: 20,
+            fontWeight: 'bold',
+            color: 'black',
+            alignSelf: 'center',
+            textAlign: 'center',
         },
     });
 

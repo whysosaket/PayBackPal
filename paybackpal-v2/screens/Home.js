@@ -1,13 +1,14 @@
 import { StatusBar } from 'expo-status-bar';
 import React, {useState, useContext, useEffect} from 'react';
-import { StyleSheet, Text, View, Button, TextInput, SafeAreaView, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, Button, TextInput, SafeAreaView, ScrollView, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import FriendContext from '../context/friendContext';
 import {styles} from '../styles/HomeStyles';
+import {popupstyles} from '../styles/ProfileStyles';
 
 
 export default function Home() {
-    const navigation = useNavigation();
+  const navigation = useNavigation();
 
   const [popup, setPopup] = useState(false);
   const [name, setName] = useState('');
@@ -16,7 +17,7 @@ export default function Home() {
 
   const context = useContext(FriendContext);
 
-  const {friends, getData, storeData} = context;
+  const {friends,allData, getData, storeName, removeAllData} = context;
 
     // navigation.navigate('Scanner');
 
@@ -28,7 +29,7 @@ export default function Home() {
     const handleAdd = async () => {
     // Add friend to list
     if(name==='') return;
-    const data = await storeData(name);
+    const data = await storeName(name);
     setName('');
     if(data==="BadRequest") {
       setAlert(true);
@@ -49,19 +50,28 @@ export default function Home() {
       setFriendsName(data);
     }
     getFriends();
-    }, []);
+    }, [friends]);
 
     const handleTyping = (e) => {
     setName(e.nativeEvent.text);
     }
 
+    const handleDelete = async () => {
+    // Delete all friends
+      removeAllData();
+      setFriendsName([]);
+      setPopup(false);
+    }
+
   return (
+    <>
     <View style={styles.container}>
       <View style={styles.headerview}>
       <Text style={styles.header}>PayBackPal</Text>
       <Text>Welcome to PayBackPal</Text>
       </View>
       <Text style={alert?styles.alert:{height: 0}} >Request Unsuccessful! Already Exists!</Text>
+      <Image onTouchEndCapture={handlePress} source={require('../assets/trash.png')} style={styles.trash} />
 
       {/* This below is the button that will help add friends */}
       <View style={styles.bottomBar} >
@@ -81,17 +91,26 @@ export default function Home() {
     </ScrollView>
     </SafeAreaView>
 
-    <Button title="Profile" onPress={() => navigation.navigate('Profile')} />
+    {/* <Button title="Profile" onPress={() => navigation.navigate('Profile')} /> */}
 
     </View>
+    {popup && <>
+      <View style={popupstyles.popup}>
+      <Text style={popupstyles.cross} onPress={handlePress}>X</Text>
+      <Text style={popupstyles.text}>Are you sure you want to delete all entries?</Text>
+      <Text style={popupstyles.delete} onPress={handleDelete}>DELETE</Text>
+    </View>
+    </>}
+    </>
   );
 }
 
-const FriendTile = ({name}) => {
+const FriendTile = ({name, total}) => {
+  const navigation = useNavigation();
   return (
-    <View style={styles.friendTile}>
+    <View style={styles.friendTile} onTouchEndCapture={() => navigation.navigate('Profile', {name})}>
       <Text>{name}</Text>
-      <Text style={styles.moneyText}>$10.00</Text>
+      <Text style={styles.moneyText}>₹10.00</Text>
     </View>
   )
 }
