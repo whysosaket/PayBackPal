@@ -54,21 +54,17 @@ const FriendState = (props) => {
         try {
             const jsonValue = await AsyncStorage.getItem('FriendName')
             const parsedValue = jsonValue != null ? JSON.parse(jsonValue) : null
-            return parsedValue;
+            // return parsedValue;
 
-            async function getProfiles (){
-                let data = [];
-                parsedValue.forEach(async (name) => {
-                    let newname = name.toLowerCase().replace(/\s/g, '');
-                    const profile = await getProfile(newname);
-                    if(profile===null) return;
-                    data.push({name: name, total: profile});
-                })
-                return data;
+            let data = [];
+            for(let i=0; i<parsedValue.length; i++) {
+                let smallName = parsedValue[i].toLowerCase().replace(/\s/g, '');
+                const currData = await getProfile(smallName);
+                data.push([parsedValue[i],currData]);
+                
             }
-            const result = await getProfiles();
-            console.log(result);
-            return result;
+            console.log(data);
+            return data;
 
         } catch(e) {
             // error reading value
@@ -120,6 +116,9 @@ const FriendState = (props) => {
                 totalCredit,
             }
             await AsyncStorage.setItem(name, JSON.stringify(newProfile));
+            // add dummy value in friends array
+            setFriends([...friends, 'xyz123@#@#@#@#%^@*']);
+            setFriends(friends.filter((item) => item!=='xyz123@#@#@#@#%^@*'));
             return newProfile;
         } catch(e) {
             // error reading value

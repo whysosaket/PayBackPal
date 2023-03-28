@@ -86,7 +86,7 @@ export default function Home() {
     <SafeAreaView style={styles.list}>
     <ScrollView style={styles.scrollView}>
       {friendsName.map((friend, index) => (
-        <FriendTile key={index} name={friend} />
+        <FriendTile key={index} name={friend[0]} amount={friend[1]} />
       ))}
     </ScrollView>
     </SafeAreaView>
@@ -105,12 +105,13 @@ export default function Home() {
   );
 }
 
-const FriendTile = ({name, total}) => {
+const FriendTile = ({name, amount}) => {
   const navigation = useNavigation();
+  if(!amount) amount=0;
   return (
     <View style={styles.friendTile} onTouchEndCapture={() => navigation.navigate('Profile', {name})}>
       <Text>{name}</Text>
-      <Text style={styles.moneyText}>₹10.00</Text>
+      <Text style={{...styles.moneyText, color: amount<0?'red':'green' }}>₹{amount}</Text>
     </View>
   )
 }
