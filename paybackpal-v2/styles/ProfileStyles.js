@@ -188,7 +188,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderRadius: 10,
         alignItems: 'center',
-        justifyContent: 'center',
         elevation: 10,
         flexDirection: 'row',
         justifyContent: 'space-between',

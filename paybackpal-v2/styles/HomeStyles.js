@@ -17,10 +17,6 @@ const styles = StyleSheet.create({
       top: 0,
       zIndex: 13,
     },
-    addButtonText: {
-      color: '#fff',
-      fontSize: 24,
-    },
     bottomBar: {
       position: 'absolute',
       zIndex: 13,
@@ -82,7 +78,6 @@ const styles = StyleSheet.create({
       backgroundColor: '#fff',
       borderRadius: 10,
       alignItems: 'center',
-      justifyContent: 'center',
       elevation: 10,
       flexDirection: 'row',
       justifyContent: 'space-between',
