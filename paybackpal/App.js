@@ -1,9 +1,11 @@
-import { StyleSheet, Text } from "react-native";
+import { View } from "react-native";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Home from "./screens/Home";
 import Profile from "./screens/Profile";
 import FriendState from "./context/FriendState";
+import { globalstyle } from "./styles/GlobalStyles";
+import { StatusBar } from "expo-status-bar";
 
 const Stack = createNativeStackNavigator();
 
@@ -19,6 +21,9 @@ function MyStack() {
 function App() {
   return <>
     <FriendState>
+      <View style={globalstyle.statusbar}>
+        <StatusBar style="dark" translucent={true} backgroundColor="#d3d6f2" animated={true} />
+      </View>
     <NavigationContainer>
       <MyStack />
     </NavigationContainer>

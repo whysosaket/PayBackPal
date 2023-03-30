@@ -23,6 +23,17 @@ const globalstyle = StyleSheet.create({
         borderBottomEndRadius: 100,
         borderBottomStartRadius: 100,      
     },
+    statusbar: {
+        flex: 1,
+        backgroundColor: '#d3d6f2',
+        color: '#d3d6f2',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        zIndex: -1,
+    }
 });
 
 export {globalstyle}

@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 const FriendState = (props) => {
 
     const [friends, setFriends] = useState([]);
-    const [allData, setAllData] = useState([]);
+    const [update, setUpdate] = useState(false);
 
     useEffect(() => {
         const getFriends = async () => {
@@ -15,16 +15,14 @@ const FriendState = (props) => {
             setFriends(parsedValue);
         }
         getFriends();
-    }, []);
+    }, [update]);
 
     const profileFormat = {
         name: '',
         transaction: [],
         total: 0,
         totalDebit: 0,
-        totalCredit: 0,
-        paid: false,
-        paidDate: '',
+        totalCredit: 0
     }
 
     const storeName = async (value) => {
@@ -92,6 +90,8 @@ const FriendState = (props) => {
     const addTransaction = async (name, transaction) => {
         name = name.toLowerCase().replace(/\s/g, '');
         const {amount, type} = transaction;
+        const date = new Date();
+        transaction.date = date;
         try {
             const jsonValue = await AsyncStorage.getItem(name);
             // add transaction to the profile
@@ -127,23 +127,28 @@ const FriendState = (props) => {
     const removeTransaction = async (name, transaction) => {
         name = name.toLowerCase().replace(/\s/g, '');
         const {amount, type} = transaction;
+        const date = new Date(transaction.date);
         try {
             const jsonValue = await AsyncStorage.getItem(name);
             // remove transaction from the profile
             let transactionArray = jsonValue != null ? JSON.parse(jsonValue).transaction : [];
-            transactionArray = transactionArray.filter((item) => item!==transaction);
+            transactionArray = transactionArray.filter((item) => { 
+                return new Date(item.date).toString()!=date.toString();
+            });
             // update the total
             let total = jsonValue != null ? JSON.parse(jsonValue).total : 0;
-            total = type==='credit' ? total-amount : total+amount;
+            if(!transaction.paid) total = type==='credit' ? total-amount : total+amount;
             // update the totalDebit
             let totalDebit = jsonValue != null ? JSON.parse(jsonValue).totalDebit : 0;
-            totalDebit = type==='debit' ? totalDebit-amount : totalDebit;
+            if(!transaction.paid) totalDebit = type==='debit' ? totalDebit-amount : totalDebit;
             // update the totalCredit
             let totalCredit = jsonValue != null ? JSON.parse(jsonValue).totalCredit : 0;
-            totalCredit = type==='credit' ? totalCredit-amount : totalCredit;
+            if(!transaction.paid) totalCredit = type==='credit' ? totalCredit-amount : totalCredit;
             // update the profile
             const newValue = {...profileFormat, name, transaction: transactionArray, total, totalDebit, totalCredit};
             await AsyncStorage.setItem(name, JSON.stringify(newValue));
+            setUpdate(!update);
+            // console.log(newValue);
             return newValue;
         } catch(e) {
             // error reading value
@@ -153,12 +158,13 @@ const FriendState = (props) => {
    const paidTransaction = async (name, transaction) => {
         name = name.toLowerCase().replace(/\s/g, '');
         const {amount, type} = transaction;
+        const date = new Date(transaction.date);
         try {
             const jsonValue = await AsyncStorage.getItem(name);
             // remove transaction from the profile
             let transactionArray = jsonValue != null ? JSON.parse(jsonValue).transaction : [];
             transactionArray = transactionArray.map((item) => {
-                if(item===transaction) {
+                if(new Date(item.date).toString()==date.toString()) {
                     item.paid = true;
                 }
                 return item;
@@ -175,6 +181,7 @@ const FriendState = (props) => {
             // update the profile
             const newValue = {...profileFormat, name, transaction: transactionArray, total, totalDebit, totalCredit};
             await AsyncStorage.setItem(name, JSON.stringify(newValue));
+            setUpdate(!update);
             return newValue;
         } catch(e) {
             // error reading value
@@ -209,7 +216,7 @@ const FriendState = (props) => {
 
 
     return(
-        <FriendContext.Provider value={{friends,allData, getData, storeName, removeAllData, addTransaction, getTransaction, removeProfile, paidTransaction, removeTransaction}}>
+        <FriendContext.Provider value={{friends,update, getData, storeName, removeAllData, addTransaction, getTransaction, removeProfile, paidTransaction, removeTransaction}}>
             {props.children}
         </FriendContext.Provider>
     )

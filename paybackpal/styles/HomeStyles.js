@@ -63,10 +63,9 @@ const styles = StyleSheet.create({
     },
     list: {
       position: 'absolute',
-      top: 170,
-      left: 25,
-      width: 350,
-      height: 500,
+      top: '21%',
+      width: '90%',
+      height: '60%',
       padding: 10,
       backgroundColor: '#fff',
       alignItems: 'center',

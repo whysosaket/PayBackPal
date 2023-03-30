@@ -96,11 +96,13 @@ export default function Home() {
 
     </View>
     {popup && <>
+      <View style={popupstyles.popupBackground} onTouchEndCapture={handlePress}>
       <View style={popupstyles.popup}>
       <Text style={popupstyles.cross} onPress={handlePress}>X</Text>
       <Text style={popupstyles.text}>Are you sure you want to delete all entries?</Text>
       <Text style={popupstyles.delete} onPress={handleDelete}>DELETE</Text>
-    </View>
+      </View>
+      </View>
     </>}
     </>
   );

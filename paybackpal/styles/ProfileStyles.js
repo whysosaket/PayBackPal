@@ -8,7 +8,7 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
     },
     headerview: {
-      top: -250,
+      top: '-36%',
       zIndex: 13,
     },
     profile: {
@@ -52,14 +52,72 @@ const styles = StyleSheet.create({
       position: 'absolute',
       zIndex: 12,
       top: '35%',
-      left: 50,
-      backgroundColor: '#fff',
+      backgroundColor: '#f5f5fa',
       height: 150,
       width: 300,
       borderRadius: 10,
       alignItems: 'center',
       justifyContent: 'center',
       elevation: 8,
+    },
+    popupBackground: {
+      position: 'absolute',
+      zIndex: 11,
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+    tpopup: {
+      position: 'absolute',
+      zIndex: 12,
+      top: '35%',
+      backgroundColor: '#f5f5fa',
+      height: 250,
+      width: 300,
+      borderRadius: 10,
+      alignItems: 'center',
+      justifyContent: 'center',
+      elevation: 8,
+    },
+    date: {
+      fontSize: 11,
+      fontWeight: 'bold',
+      color: 'black',
+      alignSelf: 'center',
+      textAlign: 'center',
+      marginTop: 5,
+      marginBottom: 5
+    },
+    ttextc: {
+      fontSize: 15,
+      fontWeight: 'bold',
+      color: 'black',
+      alignSelf: 'center',
+      textAlign: 'center',
+      color: 'green'
+    },
+    ttextd: {
+      fontSize: 15,
+      fontWeight: 'bold',
+      color: 'black',
+      alignSelf: 'center',
+      textAlign: 'center',
+      color: 'red'
+    },
+    reason: {
+      fontSize: 12,
+      fontWeight: 'bold',
+      color: 'black',
+      alignSelf: 'center',
+      textAlign: 'center',
+      marginTop: 5,
+      marginBottom: 5,
+      marginEnd: 10,
+      marginStart: 10
     },
     text: {
       fontSize: 12,
@@ -78,7 +136,8 @@ const styles = StyleSheet.create({
       borderRadius: 10,
       padding: 5,
       backgroundColor: 'red',
-      top: 10
+      top: 10,
+      elevation: 10
     },
     cross: {
       fontSize: 15,
@@ -86,7 +145,6 @@ const styles = StyleSheet.create({
       color: 'black',
       alignSelf: 'center',
       padding: 5,
-      backgroundColor: 'white',
       position: 'absolute',
       top: 2,
       right: 5,
@@ -102,10 +160,11 @@ const styles = StyleSheet.create({
       padding: 7,
       backgroundColor: 'green',
       top: 20,
-      left: -50
+      left: -50,
+      elevation: 10
     },
     debitbutton: {
-        fontSize: 15,
+      fontSize: 15,
       fontWeight: 'bold',
       color: 'white',
       alignSelf: 'center',
@@ -115,7 +174,8 @@ const styles = StyleSheet.create({
       padding: 7,
       backgroundColor: 'red',
       top: -17,
-      left: 50
+      left: 50,
+      elevation: 10
     }
   });
   
@@ -174,10 +234,9 @@ const styles = StyleSheet.create({
   const scrollViewStyles = StyleSheet.create({
     list: {
         position: 'absolute',
-        top: 240,
-        left: 25,
-        width: 350,
-        height: 300,
+        top: '35%',
+        width: '90%',
+        height: '40%',
         padding: 10,
         backgroundColor: '#fff',
         alignItems: 'center',
@@ -187,6 +246,18 @@ const styles = StyleSheet.create({
         width: 300,
         height: 50,
         backgroundColor: '#fff',
+        borderRadius: 10,
+        alignItems: 'center',
+        elevation: 10,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        margin: 10,
+        padding: 10,
+      },
+      friendTilePaid: {
+        width: 300,
+        height: 50,
+        backgroundColor: '#c9c9c9',
         borderRadius: 10,
         alignItems: 'center',
         elevation: 10,

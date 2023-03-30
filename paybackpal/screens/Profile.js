@@ -9,18 +9,25 @@ export default function Profile({route, navigation}) {
   const {name} = route.params;
 
   const [popup, setPopup] = useState(false);
+  const [transactionPopup, setTransactionPopup] = useState(false);
   const [typePopup, setTypePopup] = useState(false);
   const [amount, setAmount] = useState('');
   const [note, setNote] = useState('');
   const [transactions, setTransactions] = useState([]);
+  const [showTransactions, setShowTransactions] = useState(null);
 
   const context = useContext(FriendContext);
 
-  const {money, addTransaction, removeTransaction, paidTransaction, getTransaction, removeProfile} = context;
+  const {update, addTransaction, removeTransaction, paidTransaction, getTransaction, removeProfile} = context;
 
   const handlePress = () => {
     setPopup(!popup);
   };
+
+  const handleTransactionPress = () => {
+    setTransactionPopup(!transactionPopup);
+  };
+
   const handleTypePress = () => {
     if(amount==='') return;
     setTypePopup(!typePopup);
@@ -42,6 +49,7 @@ export default function Profile({route, navigation}) {
   const getTransactions = async () => {
     const data = await getTransaction(name);
     if(data===null) return;
+    // console.log(data);
     setTransactions(data);
   }
 
@@ -77,11 +85,22 @@ export default function Profile({route, navigation}) {
     setTypePopup(false);
   }
 
+  const handlePaid = async () => {
+    if(showTransactions.paid) return;
+    const data = await paidTransaction(name, showTransactions);
+    setTransactions(data.transaction);
+    setTransactionPopup(false);
+  }
 
+  const handleDeleteTransaction = async () => {
+    const data = await removeTransaction(name, showTransactions);
+    setTransactions(data.transaction);
+    setTransactionPopup(false);
+  }
 
   useEffect(() => {
     getTransactions();
-  }, []);
+  }, [update]);
 
   return (
     <>
@@ -106,7 +125,9 @@ export default function Profile({route, navigation}) {
 
       { transactions.length===0 && <Text style={scrollViewStyles.noTransactions}>No Transactions</Text> }
       {transactions.map((money, index) => (
-        <FriendTile key={index} reason={money.reason} amount={money.amount} type={money.type} />
+        <View key={index} onTouchEndCapture={()=>{ setTransactionPopup(!transactionPopup); setShowTransactions(money)}} >
+        <FriendTile reason={money.reason} amount={money.amount} type={money.type} paid={money.paid} />
+        </View>
       ))}
     </ScrollView>
     </SafeAreaView>
@@ -117,35 +138,52 @@ export default function Profile({route, navigation}) {
 
 
     {popup && <>
+      <View style={popupstyles.popupBackground} onTouchEndCapture={handlePress}>
       <View style={popupstyles.popup}>
       <Text style={popupstyles.cross} onPress={handlePress}>X</Text>
       <Text style={popupstyles.text}>Are you sure you want to delete this account?</Text>
       <Text style={popupstyles.delete} onPress={handleDeleteProfile}>DELETE</Text>
-    </View>
+      </View>
+      </View>
     </>
     }
 
   {typePopup && <>
+    <View style={popupstyles.popupBackground} onTouchEndCapture={handleTypePress}>
       <View style={popupstyles.popup}>
       <Text style={popupstyles.cross} onPress={handleTypePress}>X</Text>
       <Text style={popupstyles.text}>Add ₹{amount} Transaction as?</Text>
       <Text style={popupstyles.creditbutton} onPress={handleCredit}>CREDIT</Text>
       <Text style={popupstyles.debitbutton} onPress={handleDebit}>DEBIT</Text>
     </View>
+    </View>
     </>
     }
 
+    {
+      transactionPopup && <>
+      <View style={popupstyles.tpopup}>
+      <Text style={popupstyles.cross} onPress={handleTransactionPress}>X</Text>
+      <Text style={popupstyles.text}>Transaction Details</Text>
+      <Text style={showTransactions.type=="credit"?popupstyles.ttextc:popupstyles.ttextd}>₹{showTransactions.amount}</Text>
+      {/* <Text style={popupstyles.type}>{new String(showTransactions.type).toUpperCase()}</Text> */}
+      <Text style={popupstyles.date}>{new Date(showTransactions.date).toUTCString().slice(0, -3)}</Text>
+      <Text style={popupstyles.reason}>{showTransactions.reason}</Text>
+      <Text style={popupstyles.creditbutton} onPress={handlePaid}>MARK PAID</Text>
+      <Text style={popupstyles.debitbutton} onPress={handleDeleteTransaction}>DELETE</Text>
+      </View>
+      </>
+    }
 
     </>
   );
 }
 
-const FriendTile = ({reason, amount, type}) => {
+const FriendTile = ({reason, amount, type, paid}) => {
 
   if(reason.length>20) reason = reason.substring(0, 20) + '...';
-
   return (
-    <View style={scrollViewStyles.friendTile}>
+    <View style={paid===true?scrollViewStyles.friendTilePaid:scrollViewStyles.friendTile}>
       <Text>{reason}</Text>
       <Text style={type==='credit'?scrollViewStyles.moneyCredit:scrollViewStyles.moneyDebit}>₹{amount}</Text>
     </View>
