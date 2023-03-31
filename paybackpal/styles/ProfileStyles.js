@@ -241,9 +241,12 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'center',
+        borderRadius: 10,
+        elevation: 10,
+        zIndex: 13,
       },
       friendTile: {
-        width: 300,
+        width: "70%",
         height: 50,
         backgroundColor: '#fff',
         borderRadius: 10,
@@ -253,6 +256,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         margin: 10,
         padding: 10,
+        
       },
       friendTilePaid: {
         width: 300,

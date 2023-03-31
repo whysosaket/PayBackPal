@@ -162,6 +162,7 @@ export default function Profile({route, navigation}) {
 
     {
       transactionPopup && <>
+      <View style={popupstyles.popupBackground} onTouchEndCapture={handleTypePress}>
       <View style={popupstyles.tpopup}>
       <Text style={popupstyles.cross} onPress={handleTransactionPress}>X</Text>
       <Text style={popupstyles.text}>Transaction Details</Text>
@@ -171,6 +172,7 @@ export default function Profile({route, navigation}) {
       <Text style={popupstyles.reason}>{showTransactions.reason}</Text>
       <Text style={popupstyles.creditbutton} onPress={handlePaid}>MARK PAID</Text>
       <Text style={popupstyles.debitbutton} onPress={handleDeleteTransaction}>DELETE</Text>
+      </View>
       </View>
       </>
     }
