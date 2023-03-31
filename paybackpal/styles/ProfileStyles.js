@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     },
     trash: {
         position: 'absolute',
-        top: '31%',
+        top: '30%',
         width: 22,
         height: 22,
         alignItems: 'center',
@@ -239,14 +239,14 @@ const styles = StyleSheet.create({
         height: '40%',
         padding: 10,
         backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 10,
-        elevation: 10,
         zIndex: 13,
       },
+      centerList: {
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
       friendTile: {
-        width: "70%",
+        width: "90%",
         height: 50,
         backgroundColor: '#fff',
         borderRadius: 10,

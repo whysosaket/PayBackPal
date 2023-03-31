@@ -86,9 +86,11 @@ export default function Home() {
     {/* This below will be the list of friends */}
     <SafeAreaView style={styles.list}>
     <ScrollView style={styles.scrollView}>
+      <View style={styles.centerList}>
       {friendsName.map((friend, index) => (
         <FriendTile key={index} name={friend[0]} amount={friend[1]} />
       ))}
+      </View>
     </ScrollView>
     </SafeAreaView>
 

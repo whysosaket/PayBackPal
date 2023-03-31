@@ -126,7 +126,9 @@ export default function Profile({route, navigation}) {
       { transactions.length===0 && <Text style={scrollViewStyles.noTransactions}>No Transactions</Text> }
       {transactions.map((money, index) => (
         <View key={index} onTouchEndCapture={()=>{ setTransactionPopup(!transactionPopup); setShowTransactions(money)}} >
+          <View style={styles.centerList}>
         <FriendTile reason={money.reason} amount={money.amount} type={money.type} paid={money.paid} />
+        </View>
         </View>
       ))}
     </ScrollView>
