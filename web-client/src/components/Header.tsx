@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Wallet, User, Menu, X } from 'lucide-react';
+import { useState } from 'react';
+import { User, Menu, X } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 export default function Header() {
@@ -11,7 +11,6 @@ export default function Header() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
-            <Wallet className="w-8 h-8 text-purple-600" />
             <h1 className="text-2xl font-bold text-gray-900">
               PayBackPal
             </h1>
